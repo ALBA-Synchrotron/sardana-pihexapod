@@ -1,63 +1,81 @@
-from typing import List
+from cmath import log
+from typing import Dict, List, Set
 from pipython import GCSDevice, pitools
 import os
+import logging
 
 
-CONTROLLERNAME = 'C-887'
-STAGES = None  # this controller does not need a 'stages' setting
-REFMODES = 'FRF'
-
-def on_target(pidevice, axis: List[str]):
-    axis_on_target = pidevice.qONT()
+def on_target(pidevice, axes: List[str]):
+    axes_on_target = pidevice.qONT()
 
     result = True
-    for axe in axis:
-        result &= axis_on_target[axe]
+    for axis in axes:
+        result &= axes_on_target[axis]
         if result == False:
             return False
     
     return True
 
+class Hexapod(GCSDevice):
+    CONTROLLERNAME = 'C-887'
+    REFMODES = 'FRF'
+
+
+    def __init__(self, gcsdll='', gateway=None, host="localhost", port=50000):
+        super().__init__(self.CONTROLLERNAME, gcsdll=gcsdll, gateway=gateway)
+        self.ConnectTCPIP(ipaddress=host, ipport=port)
+
+        logging.info(f"Connected {self.qIDN().strip()}")
+        logging.info(f"Version:\n{self.version}")
+
+        logging.info("Initializing connected stages...")
+        pitools.startup(self, stages=None, refmodes=self.REFMODES)
+
+        logging.info(f"Connected axes: {self.axes}")
+
+        self.rangemin = self.qTMN()
+        self.rangemax = self.qTMX()
+
+        logging.info(f"Min axes range: {self.rangemin}")
+        logging.info(f"Max axes range: {self.rangemax}")
+
+    def move_to(self, pos: Dict[str, float]):
+        self.MOV(pos)
+
+    def on_target(self, axes: Set[str] = {'X', 'Y', 'Z', 'U', 'V', 'W'}):
+        axes_on_target = self.qONT()
+
+        result = True
+        for axis in axes:
+            result &= axes_on_target[axis]
+            if result == False:
+                return False
+        
+        return True
+
+
+    @property
+    def current_position(self):
+        return self.qPOS()
+
+    @property
+    def version(self):
+        return self.qVER().strip()
 
 def main():
 
-    pidevice = GCSDevice(CONTROLLERNAME)
-    pidevice.ConnectTCPIP(ipaddress='localhost')
+    hexapod = Hexapod(host="localhost", port=50000)
+    pos = {'X': -10, 'Y':-10, 'Z':-3}
+    hexapod.move_to(pos)
 
-    print('connected: {}'.format(pidevice.qIDN().strip()))
-
-    if pidevice.HasqVER():
-        print('version info:\n{}'.format(pidevice.qVER().strip()))
-
-    print('initialize connected stages...')
-    pitools.startup(pidevice, stages=STAGES, refmodes=REFMODES)
-
-    rangemin = pidevice.qTMN()
-    rangemax = pidevice.qTMX()
-    curpos = pidevice.qPOS()
-
-    print(f"Rangemin: {rangemin}")
-    print(f"Rangemax: {rangemax}")
-    print(f"curpos: {curpos}")
-
-    min = {'X': -10, 'Y':-10, 'Z':-3}
-    pidevice.MOV(min)
-    print("Y on target:", pidevice.qONT())
-
-    while not on_target(pidevice, ['X', 'Y', 'Z']):
-        position = pidevice.GetPosStatus()  # query single axis
+    while not hexapod.on_target():
+        position = hexapod.GetPosStatus()  # query single axis
         print('current position is: ', position)
 
-    pidevice.close()
-    print('done')
+    print("done")
 
 if __name__ == '__main__':
-    # To see what is going on in the background you can remove the following
-    # two hashtags. Then debug messages are shown. This can be helpful if
-    # there are any issues.
-
-    # import logging
-    # logging.basicConfig(level=logging.DEBUG)
+    logging.basicConfig(level=logging.INFO)
 
     print("PID: {}".format(os.getpid()))
     main()
