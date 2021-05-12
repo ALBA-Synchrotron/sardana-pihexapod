@@ -20,7 +20,6 @@ class Hexapod(GCSDevice):
     CONTROLLERNAME = 'C-887'
     REFMODES = 'FRF'
 
-
     def __init__(self, gcsdll='', gateway=None, host="localhost", port=50000):
         super().__init__(self.CONTROLLERNAME, gcsdll=gcsdll, gateway=gateway)
         self.ConnectTCPIP(ipaddress=host, ipport=port)
@@ -41,6 +40,9 @@ class Hexapod(GCSDevice):
 
     def move_to(self, pos: Dict[str, float]):
         self.MOV(pos)
+
+    def move_relative(self, inc: Dict[str, float]):
+        self.MVR(inc)
 
     def on_target(self, axes: Set[str] = {'X', 'Y', 'Z', 'U', 'V', 'W'}):
         axes_on_target = self.qONT()
@@ -69,10 +71,13 @@ def main():
     hexapod.move_to(pos)
 
     while not hexapod.on_target():
-        position = hexapod.GetPosStatus()  # query single axis
-        print('current position is: ', position)
+        print('current position is: ', hexapod.GetPosStatus())
 
     print("done")
+
+    for i in range(1,10):
+        hexapod.move_relative({'X': 0.3})
+        print('current position is: ', hexapod.GetPosStatus())
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
