@@ -1,1 +1,0 @@
-qemu-system-i386.exe -M pc -no-reboot -drive file=%ProgramData%\PI\PIHexapodemulator\C88752_emu.img,index=0,media=disk,format=raw -kernel linuximage -device e1000,netdev=net0 -netdev user,id=net0,hostfwd=tcp::50000-:50001,hostfwd=udp::50000-:50001,hostfwd=tcp::4443-:22,hostfwd=tcp::4444-:21 -append "root=/dev/sda1 rw console=ttyS0,115200 debug"

@@ -38,6 +38,20 @@ class Hexapod(GCSDevice):
         logging.info(f"Min axes range: {self.rangemin}")
         logging.info(f"Max axes range: {self.rangemax}")
 
+        self.move_error = False
+
+    def new_coordinate_system(self, name: str, coords: Dict[str, float]):
+        self.KSD(name, coords)
+
+    def set_parent_coordinate_system(self, childs: List[str], parent: str):
+        self.KLN(childs, parent)
+    
+    def enable_coordinate_system(self, name: str):
+        self.KEN(name)
+
+    def disable_coordinate_system(self):
+        self.KEN(0)
+
     def move_to(self, pos: Dict[str, float]):
         try:
             self.MOV(pos)
@@ -80,7 +94,7 @@ class Hexapod(GCSDevice):
 
 def main():
 
-    hexapod = Hexapod(host="localhost", port=50000)
+    hexapod = Hexapod()
     pos = {'X': -10, 'Y':-10, 'Z':-3}
     hexapod.move_to(pos)
 
