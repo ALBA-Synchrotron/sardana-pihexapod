@@ -39,6 +39,7 @@ class Hexapod(GCSDevice):
         logging.info(f"Max axes range: {self.rangemax}")
 
         self.move_error = False
+        self.move_error_msg = None
 
     def new_coordinate_system(self, name: str, coords: Dict[str, float]):
         self.KSD(name, coords)
@@ -54,18 +55,23 @@ class Hexapod(GCSDevice):
 
     def move_to(self, pos: Dict[str, float]):
         try:
+            self.move_error = False
+            self.move_error_msg = None
             self.MOV(pos)
         except Exception as e:
             logging.error(f"Exception ocurred during move_to: {e}")
             self.move_error = True
+            self.move_error_msg = e
 
     def move_relative(self, inc: Dict[str, float]):
         try:
+            self.move_error = False
+            self.move_error_msg = None
             self.MVR(inc)
         except Exception as e:
             logging.error(f"Exception ocurred during move_relative: {e}")
             self.move_error = True
-        
+            self.move_error_msg = e
 
     def on_target(self, axes: Set[str] = {'X', 'Y', 'Z', 'U', 'V', 'W'}):
         axes_on_target = self.qONT()

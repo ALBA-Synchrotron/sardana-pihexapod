@@ -19,7 +19,6 @@ class HexapodController(MotorController):
         super().__init__(inst, props, *args, **kwargs)
 
         self.hexapod = None
-        self.move_error = False
         self._motors = {}
 
     def AddDevice(self, axis):
@@ -64,8 +63,7 @@ class HexapodController(MotorController):
 
     def StateOne(self, axis):
         if self.hexapod.move_error:
-            self.move_error = True
-            return State.Fault, "Hexapod has an error", 0
+            return State.Alarm, "Hexapod has an error", 0
         else:
             if self.hexapod.on_target({self._map_axis[axis]}):
                 return State.On, "Hexapod is stopped", 0
