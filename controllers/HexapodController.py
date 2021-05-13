@@ -18,15 +18,22 @@ class HexapodController(MotorController):
     def __init__(self, inst, props, *args, **kwargs):
         super().__init__(inst, props, *args, **kwargs)
 
-        self.hexapod = Hexapod()
+        self.hexapod = None
         self.move_error = False
         self._motors = {}
 
     def AddDevice(self, axis):
+        if not self._motors:
+            self.hexapod = Hexapod()
+        
         self._motors[self._map_axis[axis]] = dict(step_per_unit=1.0)
 
     def DeleteDevice(self, axis):
         del self._motors[self._map_axis[axis]]
+
+        if not self._motors:
+            self.hexapod.close()
+            self.hexapod = None
 
     def ReadOne(self, axis):
         print(f"ReadOne {self._map_axis[axis]}")
