@@ -4,21 +4,49 @@ from pipython import GCSDevice, pitools
 import os
 import logging
 
-
-def on_target(pidevice, axes: List[str]):
-    axes_on_target = pidevice.qONT()
-
-    result = True
-    for axis in axes:
-        result &= axes_on_target[axis]
-        if result == False:
-            return False
-    
-    return True
+def bit_enabled(code: int, pos: int) -> bool:
+    return code & (0x01 << pos) != 0
 
 class Hexapod(GCSDevice):
+
     CONTROLLERNAME = 'C-887'
     REFMODES = 'FRF'
+
+    _map_axis = {
+        'X': 1,
+        'Y': 2,
+        'Z': 3,
+        'U': 4,
+        'V': 5,
+        'W': 6,
+    }
+
+    class AxisStatus:
+        def __init__(self, code) -> None:
+            self.neg_limit_switch = bit_enabled(code, 0)
+            self.reference_point_switch = bit_enabled(code, 1)
+            self.pos_limit_switch = bit_enabled(code, 2)
+
+            self.error_flag = bit_enabled(code, 8)
+            self.servo_mode_on = bit_enabled(code, 12)
+            self.in_motion = bit_enabled(code, 13)
+            self.det_ref_value = bit_enabled(code, 14)
+            self.on_target = bit_enabled(code, 15)
+
+        def __repr__(self) -> str:
+            return """{{
+                "neg_limit_switch": {},
+                "reference_point_switch": {},
+                "pos_limit_switch": {},
+                "error_flag": {},
+                "servo_mode_on": {},
+                "in_motion": {},
+                "det_ref_value": {},
+                "on_target": {},
+            }}""".format(self.neg_limit_switch, self.reference_point_switch, self.pos_limit_switch,
+                        self.error_flag, self.servo_mode_on, self.in_motion,
+                        self.det_ref_value, self.on_target)
+
 
     def __init__(self, gcsdll='', gateway=None, host="localhost", port=50000):
         super().__init__(self.CONTROLLERNAME, gcsdll=gcsdll, gateway=gateway)
@@ -40,6 +68,10 @@ class Hexapod(GCSDevice):
 
         self.move_error = False
         self.move_error_msg = None
+
+        logging.info(f"Status: {self.qSRG()}")
+
+
 
     def new_coordinate_system(self, name: str, coords: Dict[str, float]):
         self.KSD(name, coords)
@@ -84,11 +116,22 @@ class Hexapod(GCSDevice):
         
         return True
 
+    def set_pivot(self, coords: Dict[str, float]):
+        self.SPI(coords)
+
     def halt(self, axes: Set[str] = {'X', 'Y', 'Z', 'U', 'V', 'W'}):
         self.HLT(axes, noraise=True)
 
     def stop(self):
         self.STP(noraise=True)
+
+    @property
+    def velocity(self):
+        return self.qVLS()
+
+    @property.setter
+    def set_velocity(self, v: float):
+        self.VLS(v)
 
     @property
     def current_position(self):
@@ -98,6 +141,10 @@ class Hexapod(GCSDevice):
     def version(self):
         return self.qVER().strip()
 
+    def get_axis_status(self, axis: str):
+        return Hexapod.AxisStatus(self.qSRG(axes=axis, registers=1)[axis][1])
+
+
 def main():
 
     hexapod = Hexapod()
@@ -106,6 +153,7 @@ def main():
 
     while not hexapod.on_target():
         print('current position is: ', hexapod.GetPosStatus())
+        print('status:', hexapod.get_axis_status('X'))
 
     print("done")
 

@@ -63,28 +63,27 @@ class HexapodController(MotorController):
 
     def StateOne(self, axis):
         if self.hexapod.move_error:
-            return State.Alarm, "Hexapod has an error", 0
+            return State.Alarm, f"Error in axis {axis}, {self.hexapod.move_error_msg}\n{self.hexapod.get_axis_status(axis)}", 0
         else:
             if self.hexapod.on_target({self._map_axis[axis]}):
                 return State.On, "Hexapod is stopped", 0
             else:
                 return State.Moving, "Hexapod is moving", 0
     
-
-
-    def GetAxisPar(self, axis, name):
+    def GetAxisPar(self, axis: int, name: str):
         hexapod = self.hexapod
         name = name.lower()
-        if name == "acceleration":
-            return 7.5
-        elif name == "deceleration":
-            return 7.5
-        elif name == "base_rate":
-            return 1
-        elif name == "velocity":
-            return 10
+        if name == "velocity":
+            return hexapod.velocity
         elif name == "step_per_unit":
             return self._motor[self._map_axis[axis]]["step_per_unit"]
+        else:
+            logging.warning(f"HexapodController - GetAxisPar not defined: {self._map_axis[axis]}, {name}")    
 
-    def SetAxisPar(self, axis, name, value):
-        logging.warning(f"HexapodController - SetAxisPar not supported: {self._map_axis[axis]}, {name}, {value}")
+    def SetAxisPar(self, axis: int, name: str, value):
+        hexapod = self.hexapod
+        name = name.lower()
+        if name == "velocity":
+            hexapod.velocity = value
+        else:
+            logging.warning(f"HexapodController - SetAxisPar not supported: {self._map_axis[axis]}, {name}, {value}")
