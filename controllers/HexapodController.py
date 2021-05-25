@@ -87,3 +87,11 @@ class HexapodController(MotorController):
             hexapod.velocity = value
         else:
             logging.warning(f"HexapodController - SetAxisPar not supported: {self._map_axis[axis]}, {name}, {value}")
+
+    def print_to_cmd(self, p):
+        print(f"cosa cosa: {p}")
+
+    def SendToCtrl(self, stream):
+        print(f"RECV Command: {stream}")
+        r = eval(stream)
+        return str(r)
