@@ -129,9 +129,9 @@ class Hexapod(GCSDevice):
     def velocity(self):
         return self.qVLS()
 
-    @property.setter
-    def set_velocity(self, v: float):
-        self.VLS(v)
+    @velocity.setter
+    def set_velocity(self, value: float):
+        self.VLS(value)
 
     @property
     def current_position(self):
