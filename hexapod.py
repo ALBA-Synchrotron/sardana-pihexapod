@@ -76,7 +76,7 @@ class Hexapod(GCSDevice):
     def new_coordinate_system(self, name: str, coords: Dict[str, float]):
         self.KSD(name, coords)
 
-    def set_parent_coordinate_system(self, childs: List[str], parent: str):
+    def set_parent_coordinate_system(self, childs: str, parent: str):
         self.KLN(childs, parent)
     
     def enable_coordinate_system(self, name: str):
@@ -160,6 +160,18 @@ def main():
     for i in range(1,10):
         hexapod.move_relative({'X': 0.3})
         print('current position is: ', hexapod.GetPosStatus())
+
+    hexapod.new_coordinate_system(
+        "pepe", {'X': 0, 'Y': 1, 'Z': 0, 'U': 0, 'V': 0, 'W': 0})
+    hexapod.new_coordinate_system(
+        "juan", {'X': 0, 'Y': 1, 'Z': 0, 'U': 0, 'V': 0, 'W': 1})
+    hexapod.new_coordinate_system(
+        "maria", {'X': 0, 'Y': 0, 'Z': 1, 'U': 1, 'V': 0, 'W': 1})
+
+    hexapod.KLN("pepe", "maria")
+    hexapod.KLN("juan", "maria")
+
+    hexapod.set_parent_coordinate_system("pepe", "maria")
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)

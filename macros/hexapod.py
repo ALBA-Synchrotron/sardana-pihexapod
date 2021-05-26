@@ -71,41 +71,13 @@ def hexapod_disable_coordinate_system(self, hexapod):
 
 @macro(interactive=True, param_def = [
     ["hexapod", Type.String, None, "Command receiver hexapod"],
-    ["child1", Type.String, None, "Name of the child1 coordinate system"],
+    ["child", Type.String, None, "Name of the child1 coordinate system"],
     ["parent", Type.String, None, "Name of the parent coordinate system"],
 ])
-def hexapod_set_1_parent_coordinate_system(self, hexapod, child1, parent):
+def hexapod_set_parent_coordinate_system(self, hexapod, child, parent):
 
     pool = self.getPools()[0]
-    command = f'self.hexapod.set_parent_coordinate_system(["{child1}"], "{parent}")'
+    command = f'self.hexapod.set_parent_coordinate_system(["{child}"], "{parent}")'
     controller_anser = pool.SendToController([hexapod, command])
     self.output(f"{pool} controller answer: {controller_anser}")
 
-
-@macro(interactive=True, param_def = [
-    ["hexapod", Type.String, None, "Command receiver hexapod"],
-    ["child1", Type.String, None, "Name of the child1 coordinate system"],
-    ["child2", Type.String, None, "Name of the child2 coordinate system"],
-    ["parent", Type.String, None, "Name of the parent coordinate system"],
-])
-def hexapod_set_2_parent_coordinate_system(self, hexapod, child1, child2, parent):
-
-    pool = self.getPools()[0]
-    command = f'self.hexapod.set_parent_coordinate_system(["{child1}", "{child2}"], "{parent}")'
-    controller_anser = pool.SendToController([hexapod, command])
-    self.output(f"{pool} controller answer: {controller_anser}")
-
-
-@macro(interactive=True, param_def = [
-    ["hexapod", Type.String, None, "Command receiver hexapod"],
-    ["child1", Type.String, None, "Name of the child1 coordinate system"],
-    ["child2", Type.String, None, "Name of the child2 coordinate system"],
-    ["child3", Type.String, None, "Name of the child3 coordinate system"],
-    ["parent", Type.String, None, "Name of the parent coordinate system"],
-])
-def hexapod_set_3_parent_coordinate_system(self, hexapod, child1, child2, child3, parent):
-
-    pool = self.getPools()[0]
-    command = f'self.hexapod.set_parent_coordinate_system(["{child1}", "{child2}", "{child3}"], "{parent}")'
-    controller_anser = pool.SendToController([hexapod, command])
-    self.output(f"{pool} controller answer: {controller_anser}")
