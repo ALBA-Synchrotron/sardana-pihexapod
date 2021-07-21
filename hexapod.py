@@ -19,6 +19,12 @@ class Hexapod(GCSDevice):
         'U': 4,
         'V': 5,
         'W': 6,
+        1: 'X',
+        2: 'Y',
+        3: 'Z',
+        4: 'U',
+        5: 'V',
+        6: 'W'
     }
 
     class AxisStatus:
@@ -55,8 +61,7 @@ class Hexapod(GCSDevice):
         logging.info(f"Connected {self.qIDN().strip()}")
         logging.info(f"Version:\n{self.version}")
 
-        logging.info("Initializing connected stages...")
-        pitools.startup(self, stages=None, refmodes=self.REFMODES)
+        self.start_up()
 
         logging.info(f"Connected axes: {self.axes}")
 
@@ -71,7 +76,9 @@ class Hexapod(GCSDevice):
 
         logging.info(f"Status: {self.qSRG()}")
 
-
+    def start_up(self):
+        logging.info("Initializing connected stages...")
+        pitools.startup(self, stages=None, refmodes=self.REFMODES)
 
     def new_coordinate_system(self, name: str, coords: Dict[str, float]):
         self.KSD(name, coords)
@@ -142,36 +149,37 @@ class Hexapod(GCSDevice):
         return self.qVER().strip()
 
     def get_axis_status(self, axis: str):
-        return Hexapod.AxisStatus(self.qSRG(axes=axis, registers=1)[axis][1])
+        return Hexapod.AxisStatus(self.qSRG()[str(self._map_axis[axis])][1])
 
 
 def main():
 
-    hexapod = Hexapod()
-    pos = {'X': -10, 'Y':-10, 'Z':-3}
+    hexapod = Hexapod(host="dlaelcthex01")
+    pos = {'X': 1, 'Y':0, 'Z':0}
     hexapod.move_to(pos)
 
     while not hexapod.on_target():
         print('current position is: ', hexapod.GetPosStatus())
-        print('status:', hexapod.get_axis_status('X'))
+        for axis in hexapod.axes:
+            print('status:', hexapod.get_axis_status(axis))
 
     print("done")
 
-    for i in range(1,10):
-        hexapod.move_relative({'X': 0.3})
-        print('current position is: ', hexapod.GetPosStatus())
+    #for i in range(1,10):
+    #    hexapod.move_relative({'X': 0.3})
+    #    print('current position is: ', hexapod.GetPosStatus())
 
-    hexapod.new_coordinate_system(
-        "pepe", {'X': 0, 'Y': 1, 'Z': 0, 'U': 0, 'V': 0, 'W': 0})
-    hexapod.new_coordinate_system(
-        "juan", {'X': 0, 'Y': 1, 'Z': 0, 'U': 0, 'V': 0, 'W': 1})
-    hexapod.new_coordinate_system(
-        "maria", {'X': 0, 'Y': 0, 'Z': 1, 'U': 1, 'V': 0, 'W': 1})
+    # hexapod.new_coordinate_system(
+    #     "pepe", {'X': 0, 'Y': 1, 'Z': 0, 'U': 0, 'V': 0, 'W': 0})
+    # hexapod.new_coordinate_system(
+    #     "juan", {'X': 0, 'Y': 1, 'Z': 0, 'U': 0, 'V': 0, 'W': 1})
+    # hexapod.new_coordinate_system(
+    #     "maria", {'X': 0, 'Y': 0, 'Z': 1, 'U': 1, 'V': 0, 'W': 1})
+# 
+    # hexapod.KLN("pepe", "maria")
+    # hexapod.KLN("juan", "maria")
 
-    hexapod.KLN("pepe", "maria")
-    hexapod.KLN("juan", "maria")
-
-    hexapod.set_parent_coordinate_system("pepe", "maria")
+    # hexapod.set_parent_coordinate_system("pepe", "maria")
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
