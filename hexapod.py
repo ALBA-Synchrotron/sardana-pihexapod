@@ -165,9 +165,9 @@ def main():
 
     print("done")
 
-    #for i in range(1,10):
-    #    hexapod.move_relative({'X': 0.3})
-    #    print('current position is: ', hexapod.GetPosStatus())
+    for i in range(1,10):
+        hexapod.move_relative({'X': 0.3})
+        print('current position is: ', hexapod.GetPosStatus())
 
     # hexapod.new_coordinate_system(
     #     "pepe", {'X': 0, 'Y': 1, 'Z': 0, 'U': 0, 'V': 0, 'W': 0})
