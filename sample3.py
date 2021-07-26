@@ -8,24 +8,44 @@ import time
 def main():
 
     hexapod = Hexapod(host="dlaelcthex01")
-    
-    hexapod.move_to({'X': 0, 'Y':0, 'Z':0, 'U': 0, 'V':0, 'W':0})
+
+    hexapod.x = 1
+    time.sleep(0.1)
+    hexapod.y = -1
+    time.sleep(0.1)
+    hexapod.z = 1
+    time.sleep(0.1)
+    hexapod.u = -1
+    time.sleep(0.1)
+    hexapod.v = 1
+    time.sleep(0.1)
+    hexapod.w = -1
 
     while not hexapod.on_target():
-        print('current position is: ', hexapod.position)
-        #for axis in hexapod.axes:
-        #    print('status:', hexapod.get_axis_status(axis))
+        x = hexapod.x
+        time.sleep(0.1)
+        y = hexapod.y
+        time.sleep(0.1)
+        z = hexapod.z
+        time.sleep(0.1)
+        u = hexapod.u
+        time.sleep(0.1)
+        v = hexapod.v
+        time.sleep(0.1)
+        w = hexapod.w
+        print('current position is: ', x, y, z, u, v, w)
+        time.sleep(1)
 
-    print("done")
-
-    t0 = time.time()
+    hexapod.x = -1
     hexapod.y = 1
-    while not hexapod.on_target():
-        print('current position is: ', hexapod.y)
-    t1 = time.time()
-    
-    print(f"Done in {t1 - t0}s")
+    hexapod.z = -1
+    hexapod.u = 1
+    hexapod.v = -1
+    hexapod.w = 1
 
+    while not hexapod.on_target():
+        print('current position is: ', hexapod.x, hexapod.y, hexapod.z, hexapod.u, hexapod.v, hexapod.w)
+        time.sleep(1)
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
