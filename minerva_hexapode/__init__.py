@@ -106,12 +106,16 @@ class Hexapod(GCSDevice):
         logging.info("Initializing connected stages...")
         
         initialized = False
-        while not initialized:
+        max_attemps = 5
+        while not initialized and max_attemps > 0:
             try:
                 pitools.startup(self, stages=None, refmodes=self.REFMODES)
                 initialized = True
             except pipython.gcserror.GCSError as ex:
+                max_attemps -= 1
                 logging.warn(ex)
+                if max_attemps == 0:
+                    raise ex
         
 
     def new_coordinate_system(self, name: str, coords: Dict[str, float]):
@@ -201,7 +205,7 @@ class Hexapod(GCSDevice):
 
     @property
     def position(self):
-        return self.Position(self.current_position(), self.current_units())
+        return self.Position(self, self.current_position(), self.current_units())
 
 # TODO: Add units to prints and documentation
 # TODO: Close connection clean on destroy
