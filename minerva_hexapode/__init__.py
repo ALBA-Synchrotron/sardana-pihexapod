@@ -223,7 +223,6 @@ class Hexapod(GCSDevice):
     @y.setter
     def y(self, value):
         self.move_to({"Y": value})
-    @property
 
     @property
     def z(self):
@@ -258,6 +257,4 @@ class Hexapod(GCSDevice):
         self.move_to({"W": value})
 
 
-# TODO: Close connection clean on destroy
-# TODO: Position property (x,y,z) i.e: hex.x = 3
 # TODO: setup.py and readme
