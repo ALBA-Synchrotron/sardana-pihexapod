@@ -48,7 +48,7 @@ class Hexapod(GCSDevice):
             self.units_w = units['W']
         
         def __repr__(self) -> str:
-            return f"""{{"X:" {self.x}{self.units_x}, "Y:" {self.y}{self.units_y}, "Z:" {self.z}{self.units_z}, "U:" {self.u}{self.units_u}, "V:" {self.v}{self.units_v}, "W:" {self.w}{self.units_w} }}"""
+            return f"""{{"X": {self.x}{self.units_x}, "Y": {self.y}{self.units_y}, "Z": {self.z}{self.units_z}, "U": {self.u}{self.units_u}, "V": {self.v}{self.units_v}, "W": {self.w}{self.units_w} }}"""
 
     class AxisStatus:
         def __init__(self, code) -> None:
