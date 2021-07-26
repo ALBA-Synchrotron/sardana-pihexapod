@@ -8,6 +8,10 @@ def bit_enabled(code: int, pos: int) -> bool:
     return code & (0x01 << pos) != 0
 
 class Hexapod(GCSDevice):
+    """
+    All the axis are printed in the specified system units. By default milimeters
+    for X, Y, Z axis and degrees for U, V, W. 
+    """
 
     CONTROLLERNAME = 'C-887'
     REFMODES = 'FRF'
@@ -26,6 +30,25 @@ class Hexapod(GCSDevice):
         5: 'V',
         6: 'W'
     }
+
+    class Position:
+        def __init__(self, position, units) -> None:
+            self.x = position['X']
+            self.y = position['Y']
+            self.z = position['Z']
+            self.u = position['U']
+            self.v = position['V']
+            self.w = position['W']
+
+            self.units_x = units['X']
+            self.units_y = units['Y']
+            self.units_z = units['Z']
+            self.units_u = units['U']
+            self.units_v = units['V']
+            self.units_w = units['W']
+        
+        def __repr__(self) -> str:
+            return f"""{{"X:" {self.x}{self.units_x}, "Y:" {self.y}{self.units_y}, "Z:" {self.z}{self.units_z}, "U:" {self.u}{self.units_u}, "V:" {self.v}{self.units_v}, "W:" {self.w}{self.units_w} }}"""
 
     class AxisStatus:
         def __init__(self, code) -> None:
@@ -76,9 +99,20 @@ class Hexapod(GCSDevice):
 
         logging.info(f"Status: {self.qSRG()}")
 
+    def __del__(self):
+        self.CloseConnection()
+
     def start_up(self):
         logging.info("Initializing connected stages...")
-        pitools.startup(self, stages=None, refmodes=self.REFMODES)
+        
+        initialized = False
+        while not initialized:
+            try:
+                pitools.startup(self, stages=None, refmodes=self.REFMODES)
+                initialized = True
+            except pipython.gcserror.GCSError as ex:
+                logging.warn(ex)
+        
 
     def new_coordinate_system(self, name: str, coords: Dict[str, float]):
         self.KSD(name, coords)
@@ -89,10 +123,19 @@ class Hexapod(GCSDevice):
     def enable_coordinate_system(self, name: str):
         self.KEN(name)
 
+    def get_enabled_coordinate_system(self):
+        return self.qKEN()
+
     def disable_coordinate_system(self):
         self.KEN(0)
 
+    def remove_coordinate_system(self, name: str):
+        self.KRM(name)
+
     def move_to(self, pos: Dict[str, float]):
+        """
+            Is not a blocking method.
+        """
         try:
             self.move_error = False
             self.move_error_msg = None
@@ -132,6 +175,12 @@ class Hexapod(GCSDevice):
     def stop(self):
         self.STP(noraise=True)
 
+    def current_position(self):
+        return self.qPOS()
+
+    def current_units(self):
+        return self.qPUN()
+
     @property
     def velocity(self):
         return self.qVLS()
@@ -141,48 +190,20 @@ class Hexapod(GCSDevice):
         self.VLS(value)
 
     @property
-    def current_position(self):
-        return self.qPOS()
-
-    @property
     def version(self):
         return self.qVER().strip()
 
-    def get_axis_status(self, axis: str):
+    def get_axis_status(self, axes: str):
         return Hexapod.AxisStatus(self.qSRG()[str(self._map_axis[axis])][1])
 
+    def is_referenced(self, axes: Set[str] = {'X', 'Y', 'Z', 'U', 'V', 'W'}):
+        return self.FRF(axes)
 
-def main():
+    @property
+    def position(self):
+        return self.Position(self.current_position(), self.current_units())
 
-    hexapod = Hexapod(host="dlaelcthex01")
-    pos = {'X': 1, 'Y':0, 'Z':0}
-    hexapod.move_to(pos)
-
-    while not hexapod.on_target():
-        print('current position is: ', hexapod.GetPosStatus())
-        for axis in hexapod.axes:
-            print('status:', hexapod.get_axis_status(axis))
-
-    print("done")
-
-    for i in range(1,10):
-        hexapod.move_relative({'X': 0.3})
-        print('current position is: ', hexapod.GetPosStatus())
-
-    # hexapod.new_coordinate_system(
-    #     "pepe", {'X': 0, 'Y': 1, 'Z': 0, 'U': 0, 'V': 0, 'W': 0})
-    # hexapod.new_coordinate_system(
-    #     "juan", {'X': 0, 'Y': 1, 'Z': 0, 'U': 0, 'V': 0, 'W': 1})
-    # hexapod.new_coordinate_system(
-    #     "maria", {'X': 0, 'Y': 0, 'Z': 1, 'U': 1, 'V': 0, 'W': 1})
-# 
-    # hexapod.KLN("pepe", "maria")
-    # hexapod.KLN("juan", "maria")
-
-    # hexapod.set_parent_coordinate_system("pepe", "maria")
-
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-
-    print("PID: {}".format(os.getpid()))
-    main()
+# TODO: Add units to prints and documentation
+# TODO: Close connection clean on destroy
+# TODO: Position property (x,y,z) i.e: hex.x = 3
+# TODO: setup.py and readme
