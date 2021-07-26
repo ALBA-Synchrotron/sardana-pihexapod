@@ -1,6 +1,6 @@
 from cmath import log
 from typing import Dict, List, Set
-from pipython import GCSDevice, pitools
+from pipython import GCSDevice, pitools, gcserror
 import os
 import logging
 
@@ -50,6 +50,7 @@ class Hexapod(GCSDevice):
         def __repr__(self) -> str:
             return f"""{{"X": {self.x}{self.units_x}, "Y": {self.y}{self.units_y}, "Z": {self.z}{self.units_z}, "U": {self.u}{self.units_u}, "V": {self.v}{self.units_v}, "W": {self.w}{self.units_w} }}"""
 
+            
     class AxisStatus:
         def __init__(self, code) -> None:
             self.neg_limit_switch = bit_enabled(code, 0)
@@ -111,12 +112,12 @@ class Hexapod(GCSDevice):
             try:
                 pitools.startup(self, stages=None, refmodes=self.REFMODES)
                 initialized = True
-            except pipython.gcserror.GCSError as ex:
+            except gcserror.GCSError as ex:
                 max_attemps -= 1
                 logging.warn(ex)
                 if max_attemps == 0:
                     raise ex
-        
+
 
     def new_coordinate_system(self, name: str, coords: Dict[str, float]):
         self.KSD(name, coords)
@@ -197,7 +198,7 @@ class Hexapod(GCSDevice):
     def version(self):
         return self.qVER().strip()
 
-    def get_axis_status(self, axes: str):
+    def get_axis_status(self, axis: str):
         return Hexapod.AxisStatus(self.qSRG()[str(self._map_axis[axis])][1])
 
     def is_referenced(self, axes: Set[str] = {'X', 'Y', 'Z', 'U', 'V', 'W'}):
@@ -205,9 +206,58 @@ class Hexapod(GCSDevice):
 
     @property
     def position(self):
-        return self.Position(self, self.current_position(), self.current_units())
+        return self.Position(self.current_position(), self.current_units())
 
-# TODO: Add units to prints and documentation
+    @property
+    def x(self):
+        return self.current_position()['X']
+
+    @x.setter
+    def x(self, value):
+        self.move_to({"X": value})
+
+    @property
+    def y(self):
+        return self.current_position()['Y']
+
+    @y.setter
+    def y(self, value):
+        self.move_to({"Y": value})
+    @property
+
+    @property
+    def z(self):
+        return self.current_position()['Z']
+
+    @z.setter
+    def z(self, value):
+        self.move_to({"Z": value})
+
+    @property
+    def u(self):
+        return self.current_position()['U']
+
+    @u.setter
+    def u(self, value):
+        self.move_to({"U": value})
+
+    @property
+    def v(self):
+        return self.current_position()['V']
+
+    @v.setter
+    def v(self, value):
+        self.move_to({"V": value})
+
+    @property
+    def w(self):
+        return self.current_position()['W']
+
+    @w.setter
+    def w(self, value):
+        self.move_to({"W": value})
+
+
 # TODO: Close connection clean on destroy
 # TODO: Position property (x,y,z) i.e: hex.x = 3
 # TODO: setup.py and readme
