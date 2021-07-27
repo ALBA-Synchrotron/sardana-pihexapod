@@ -160,6 +160,9 @@ class Hexapod(GCSDevice):
             self.move_error = True
             self.move_error_msg = e
 
+    def move_to_zero(self):
+        self.move_to({'X':0, 'Y':0, 'Z':0, 'U':0, 'V':0, 'W':0})
+
     def on_target(self, axes: Set[str] = {'X', 'Y', 'Z', 'U', 'V', 'W'}):
         axes_on_target = self.qONT()
 
