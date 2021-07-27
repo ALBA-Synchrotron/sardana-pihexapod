@@ -6,7 +6,7 @@ from sardana.macroserver.msparameter import Type
     ["hexapod", Type.String, None, "Command receiver hexapod"],
     ["command", Type.String, None, "Command to send to the hexapod"]
 ])
-def send_to_hexapode(self, hexapod, command):
+def send_to_hexapod(self, hexapod, command):
 
     pool = self.getPools()[0]
     controller_anser = pool.SendToController([hexapod, command])

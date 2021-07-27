@@ -1,6 +1,6 @@
 # Sample2: Test the velocity of the system moving one axis.
 
-from minerva_hexapode import Hexapod
+from minerva_hexapod import Hexapod
 import logging
 import os
 import time

@@ -1,5 +1,5 @@
 # Sample 1: Example of how to use the main features of the library
-from minerva_hexapode import Hexapod
+from minerva_hexapod import Hexapod
 import logging
 import os
 

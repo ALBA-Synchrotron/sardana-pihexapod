@@ -1,6 +1,6 @@
 # Sample3: Test the position property system
 
-from minerva_hexapode import Hexapod
+from minerva_hexapod import Hexapod
 import logging
 import os
 import time

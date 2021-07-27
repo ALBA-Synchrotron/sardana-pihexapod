@@ -1,4 +1,4 @@
-# Python Hexapode library for PI C-887 Controller
+# Python hexapod library for PI C-887 Controller
 
 ## Requirements
 
