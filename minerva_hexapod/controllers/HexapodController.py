@@ -15,6 +15,13 @@ class HexapodController(MotorController):
         6: 'W',
     }
 
+    # The properties used to connect to the IcePAP motor controller
+    ctrl_properties = {
+        'Host': {Type: str, Description: 'The host name', DefaultValue: "dlaelcthex01"},
+        'Port': {Type: int, Description: 'The port number', DefaultValue: 50000}
+    }
+    
+
     def __init__(self, inst, props, *args, **kwargs):
         super().__init__(inst, props, *args, **kwargs)
 
@@ -23,7 +30,7 @@ class HexapodController(MotorController):
 
     def AddDevice(self, axis):
         if not self._motors:
-            self.hexapod = Hexapod()
+            self.hexapod = Hexapod(host=self.Host, port=self.Port)
         
         self._motors[self._map_axis[axis]] = dict(step_per_unit=1.0)
 
