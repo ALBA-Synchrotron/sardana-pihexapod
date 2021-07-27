@@ -4,7 +4,31 @@
 
 Install PI GSCD Library for your operating system and install the PIPython library that supports it. This library was tested with `PIPython==1.5`
 
-## Sardana Installation
+## Installation
+
+Clone this repository:
+```
+https://git.cells.es/controls/minerva/python_hexapod_core.git
+```
+
+Install with pip
+```
+pip install .
+```
+
+### Test
+
+```python
+>>> from minerva_hexapod import Hexapod
+>>> h = Hexapod(host="dlaelcthex01")
+>>> h.axes
+['X', 'Y', 'Z', 'U', 'V', 'W']
+>>> h.move_to({"X": 1})
+>>> h.position
+{"X": 0.999997220867mm, "Y": 1.22225325645e-06mm, "Z": 3.03443967969e-08mm, "U": -1.42516686632e-07deg, "V": 8.01359844144e-08deg, "W": 1.2431950165e-07deg }
+```
+
+## Add to Sardana
 Locate the path where this package have been installed. Usually in site-pakcages and add the path to the macros to the MacroServer macro path configuration. Do the same with the pool and the controllers.
 
 ### Controller
