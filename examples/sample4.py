@@ -1,12 +1,12 @@
 # Sample4: Test reconnection
 
-from minerva_hexapod import Hexapod
+from sardana_pihexapod.ctrl.pihexapod import PIHexapod
 import logging
 import os
 
 def main():
 
-    hexapod = Hexapod(host="dlaelcthex01")
+    hexapod = PIHexapod(host="dlaelcthex01")
     hexapod.move_to({'X': 0, 'Y':0, 'Z':0, 'U': 0, 'V':0, 'W':0})
 
     while not hexapod.on_target():
@@ -15,7 +15,7 @@ def main():
 
     # Test Reconnection to the hexapod
     hexapod = None
-    hexapod = Hexapod(host="dlaelcthex01")
+    hexapod = PIHexapod(host="dlaelcthex01")
 
     hexapod.y = 1
     while not hexapod.on_target():

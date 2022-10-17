@@ -1,8 +1,8 @@
-from hexapod import Hexapod
-
 from sardana.pool.controller import MotorController
 from sardana import State
 import logging
+
+from sardana.ctrl.pihexapod import PIHexapod
 
 class PIHexapodCtrl(MotorController):
 

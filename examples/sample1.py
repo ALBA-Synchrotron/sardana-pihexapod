@@ -1,11 +1,11 @@
 # Sample 1: Example of how to use the main features of the library
-from minerva_hexapod import Hexapod
+from sardana_pihexapod.ctrl.pihexapod import PIHexapod
 import logging
 import os
 
 def main():
 
-    hexapod = Hexapod(host="dlaelcthex01")
+    hexapod = PIHexapod(host="dlaelcthex01")
     hexapod.move_to({'X': 1, 'Y':0, 'Z':0})
 
     while not hexapod.on_target():

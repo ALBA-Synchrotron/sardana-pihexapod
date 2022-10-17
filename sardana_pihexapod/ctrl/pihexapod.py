@@ -7,7 +7,7 @@ import logging
 def bit_enabled(code: int, pos: int) -> bool:
     return code & (0x01 << pos) != 0
 
-class Hexapod(GCSDevice):
+class PIHexapod(GCSDevice):
     """
     All the axis are printed in the specified system units. By default milimeters
     for X, Y, Z axis and degrees for U, V, W. 

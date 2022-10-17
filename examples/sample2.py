@@ -1,13 +1,13 @@
 # Sample2: Test the velocity of the system moving one axis.
 
-from minerva_hexapod import Hexapod
+from sardana_pihexapod.ctrl.pihexapod import PIHexapod
 import logging
 import os
 import time
 
 def main():
 
-    hexapod = Hexapod(host="dlaelcthex01")
+    hexapod = PIHexapod(host="dlaelcthex01")
     
     hexapod.move_to({'X': 0, 'Y':0, 'Z':0, 'U': 0, 'V':0, 'W':0})
 

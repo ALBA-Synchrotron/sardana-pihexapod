@@ -1,13 +1,13 @@
 # Sample3: Test the position property system
 
-from minerva_hexapod import Hexapod
+from sardana_pihexapod.ctrl.pihexapod import PIHexapod
 import logging
 import os
 import time
 
 def main():
 
-    hexapod = Hexapod(host="dlaelcthex01")
+    hexapod = PIHexapod(host="dlaelcthex01")
 
     hexapod.x = 1
     time.sleep(0.1)
