@@ -30,7 +30,7 @@ class PIHexapodCtrl(MotorController):
 
     def AddDevice(self, axis):
         if not self._motors:
-            self.hexapod = Hexapod(host=self.Host, port=self.Port)
+            self.hexapod = PIHexapod(host=self.Host, port=self.Port)
         
         self._motors[self._map_axis[axis]] = dict(step_per_unit=1.0)
 
