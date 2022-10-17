@@ -5,7 +5,7 @@ import logging
 
 from sardana.ctrl.pihexapod import PIHexapod
 
-class PIHexapodCtrl(MotorController):
+class PIHexapodMotCtrl(MotorController):
 
     _map_axis = {
         1: 'X',
