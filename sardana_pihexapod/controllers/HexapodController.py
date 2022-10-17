@@ -4,7 +4,7 @@ from sardana.pool.controller import MotorController
 from sardana import State
 import logging
 
-class HexapodController(MotorController):
+class PIHexapodCtrl(MotorController):
 
     _map_axis = {
         1: 'X',
