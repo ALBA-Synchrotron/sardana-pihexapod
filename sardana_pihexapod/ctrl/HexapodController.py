@@ -1,4 +1,5 @@
-from sardana.pool.controller import MotorController
+from sardana.pool.controller import MotorController, Type, Description, \
+    DefaultValue
 from sardana import State
 import logging
 
