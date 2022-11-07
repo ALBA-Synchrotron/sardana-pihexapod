@@ -3,7 +3,7 @@ from sardana.pool.controller import MotorController, Type, Description, \
 from sardana import State
 import logging
 
-from sardana.ctrl.pihexapod import PIHexapod
+from sardana_pihexapod.ctrl.pihexapod import PIHexapod
 
 class PIHexapodMotCtrl(MotorController):
 
