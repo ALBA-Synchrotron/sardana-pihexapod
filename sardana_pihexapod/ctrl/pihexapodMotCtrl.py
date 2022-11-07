@@ -44,7 +44,7 @@ class PIHexapodMotCtrl(MotorController):
 
     def ReadOne(self, axis):
         print(f"ReadOne {self._map_axis[axis]}")
-        return self.hexapod.current_position[self._map_axis[axis]]
+        return self.hexapod.current_position()[self._map_axis[axis]]
 
     def PreStartAll(self):
         # clear the local motion information dictionary
