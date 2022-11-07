@@ -5,6 +5,8 @@ import logging
 
 from sardana_pihexapod.ctrl.pihexapod import PIHexapod
 
+import time
+
 class PIHexapodMotCtrl(MotorController):
 
     _map_axis = {
@@ -103,3 +105,40 @@ class PIHexapodMotCtrl(MotorController):
         print(f"RECV Command: {stream}")
         r = eval(stream)
         return str(r)
+
+
+def main():
+    host = 'dlaelcthex01'
+    port = 50000
+    ctrl = PIHexapodMotCtrl('test', {'Host': host, 'Port': port})
+    ctrl.AddDevice(1)
+    ctrl.AddDevice(2)
+    ctrl.AddDevice(3)
+    ctrl.AddDevice(4)
+    ctrl.AddDevice(5)
+    ctrl.AddDevice(6)
+
+    # ctrl._synchronization = AcqSynch.SoftwareTrigger
+    # ctrl._synchronization = AcqSynch.HardwareTrigger
+    axis1 = 3
+    position1 = -3
+    ctrl.PreStartAll()
+    ctrl.StartOne(axis1, position1)
+    axis2 = 4
+    position2 = -1
+    ctrl.StartOne(axis2, position2)
+    ctrl.StartAll()
+
+    t0 = time.time()
+    print(ctrl.StateAll())
+    while ctrl.StateOne(axis1)[0] != State.On:
+        ctrl.StateAll()
+        time.sleep(0.1)
+    print(time.time() - t0)
+    print(ctrl.ReadAll())
+    print("Axis1: ", axis1, ctrl.ReadOne(axis1))
+    print("Axis2: ", axis2, ctrl.ReadOne(axis2))
+    return ctrl
+
+if __name__ == '__main__':
+    main()
