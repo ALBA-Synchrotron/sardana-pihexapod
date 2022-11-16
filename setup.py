@@ -8,8 +8,7 @@ with open('README.md') as readme_file:
 with open('HISTORY.md') as history_file:
     history = history_file.read()
 
-requirements = [
-]
+requirements = ['sardana', 'pipython']
 
 setup(
     author="Alberto López Sánchez",
@@ -33,9 +32,9 @@ setup(
     long_description=readme + '\n\n' + history,
     long_description_content_type="text/markdown",
     include_package_data=True,
-    keywords='minerva_hexapod',
-    name='minerva_hexapod',
-    packages=find_packages(include=['minerva_hexapod', 'minerva_hexapod.*']),
+    keywords='sardana_pihexapod',
+    name='sardana_pihexapod',
+    packages=find_packages(include=['sardana_pihexapod', 'sardana_pihexapod.*']),
 
     url='https://git.cells.es/controls/minerva/python_hexapod_core',
     version='1.0.1',

@@ -19,8 +19,8 @@ pip install .
 ### Test
 
 ```python
->>> from minerva_hexapod import Hexapod
->>> h = Hexapod(host="dlaelcthex01")
+>>> from sardana_pihexapod.ctrl.pihexapod import PIHexapod
+>>> h = PIHexapod(host="dlaelcthex01")
 >>> h.axes
 ['X', 'Y', 'Z', 'U', 'V', 'W']
 >>> h.move_to({"X": 1})
@@ -38,13 +38,15 @@ For instance:
 Pool_<ServerName>_<ServerNumber>.put_property({"PoolPath":["<Your controller dir path>"]})
 
 Example:
-Pool_lab01_1.put_property({'PoolPath': [r'C:\Users\sunlo\miniconda3\envs\sardana\Lib\site-packages\python_hexapod_core\controllers']})
+Pool_lab01_1.put_property({'PoolPath': 
+[r'C:\Users\sunlo\miniconda3\envs\sardana\Lib\site-packages\sardana_pihexapod
+\ctrl']})
 ```
 
 Then create a controller:
 
 ```
-defctrl HexapodController hexCtrl Host dlaelcthex01
+defctrl PIHexapodMotCtrl hexCtrl Host dlaelcthex01
 ```
 
 Then define the axes:
@@ -68,7 +70,9 @@ To install the macros the same procedure have to be done:
 _MACRO_SERVER.put_property({"MacroPath":["<Your macro dir path>"]})
 
 Example:
-_MACRO_SERVER.put_property({'MacroPath': [r'C:\Users\sunlo\miniconda3\envs\sardana\Lib\site-packages\python_hexapod_core\macros']})
+_MACRO_SERVER.put_property({'MacroPath': 
+[r'C:\Users\sunlo\miniconda3\envs\sardana\Lib\site-packages\sardana_pihexapod
+\macros']})
 ```
 
 ## Known Issues
