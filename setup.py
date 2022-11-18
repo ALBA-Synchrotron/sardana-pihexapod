@@ -13,7 +13,7 @@ requirements = ['sardana', 'pipython']
 setup(
     author="Alberto López Sánchez",
     author_email='ctbeamlines@cells.es',
-    python_requires='>=3.8',
+    python_requires='>=3.6',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
