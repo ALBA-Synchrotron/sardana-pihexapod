@@ -202,7 +202,7 @@ class PIHexapod(GCSDevice):
         return self.qVER().strip()
 
     def get_axis_status(self, axis: str):
-        return Hexapod.AxisStatus(self.qSRG()[str(self._map_axis[axis])][1])
+        return PIHexapod.AxisStatus(self.qSRG()[str(self._map_axis[axis])][1])
 
     def is_referenced(self, axes: Set[str] = {'X', 'Y', 'Z', 'U', 'V', 'W'}):
         return self.FRF(axes)
