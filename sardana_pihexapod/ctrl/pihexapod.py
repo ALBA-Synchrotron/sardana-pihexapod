@@ -1,6 +1,7 @@
 from cmath import log
 from typing import Dict, List, Set
 from pipython import GCSDevice, pitools, gcserror
+from pipython.pidevice.interfaces.pisocket import PISocket
 import os
 import logging
 
@@ -79,8 +80,17 @@ class PIHexapod(GCSDevice):
 
 
     def __init__(self, gcsdll='', gateway=None, host="localhost", port=50000):
-        super().__init__(self.CONTROLLERNAME, gcsdll=gcsdll, gateway=gateway)
-        self.ConnectTCPIP(ipaddress=host, ipport=port)
+        if gateway is None:
+            gateway = PISocket(host=host, port=port)
+            super().__init__(gateway=gateway)
+
+        elif gateway == 'dll':
+            # Use dll as gateway. It requires the GCS DLL to be installed
+            super().__init__(devname=self.CONTROLLERNAME, gcsdll=gcsdll)
+            self.ConnectTCPIP(ipaddress=host, ipport=port)
+        
+        else:
+            super().__init__(devname=self.CONTROLLERNAME, gcsdll=gcsdll, gateway=gateway)
 
         logging.info(f"Connected {self.qIDN().strip()}")
         logging.info(f"Version:\n{self.version}")
