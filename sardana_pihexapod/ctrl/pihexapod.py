@@ -5,13 +5,15 @@ from pipython.pidevice.interfaces.pisocket import PISocket
 import os
 import logging
 
+
 def bit_enabled(code: int, pos: int) -> bool:
     return code & (0x01 << pos) != 0
 
+
 class PIHexapod(GCSDevice):
     """
-    All the axis are printed in the specified system units. By default milimeters
-    for X, Y, Z axis and degrees for U, V, W. 
+    All the axis are printed in the specified system units.
+    By default milimeters for X, Y, Z axis and degrees for U, V, W.
     """
 
     CONTROLLERNAME = 'C-887'
@@ -47,11 +49,14 @@ class PIHexapod(GCSDevice):
             self.units_u = units['U']
             self.units_v = units['V']
             self.units_w = units['W']
-        
-        def __repr__(self) -> str:
-            return f"""{{"X": {self.x}{self.units_x}, "Y": {self.y}{self.units_y}, "Z": {self.z}{self.units_z}, "U": {self.u}{self.units_u}, "V": {self.v}{self.units_v}, "W": {self.w}{self.units_w} }}"""
 
-            
+        def __repr__(self) -> str:
+            message =\
+                f"{{'X': {self.x}{self.units_x}, 'Y': {self.y}{self.units_y},"\
+                f"'Z': {self.z}{self.units_z}, 'U': {self.u}{self.units_u},"\
+                f"'V': {self.v}{self.units_v}, 'W': {self.w}{self.units_w} }}"
+            return message
+
     class AxisStatus:
         def __init__(self, code) -> None:
             self.neg_limit_switch = bit_enabled(code, 0)
@@ -74,10 +79,10 @@ class PIHexapod(GCSDevice):
                 "in_motion": {},
                 "det_ref_value": {},
                 "on_target": {},
-            }}""".format(self.neg_limit_switch, self.reference_point_switch, self.pos_limit_switch,
-                        self.error_flag, self.servo_mode_on, self.in_motion,
-                        self.det_ref_value, self.on_target)
-
+            }}""".format(self.neg_limit_switch, self.reference_point_switch,
+                         self.pos_limit_switch, self.error_flag,
+                         self.servo_mode_on, self.in_motion,
+                         self.det_ref_value, self.on_target)
 
     def __init__(self, gcsdll='', gateway=None, host="localhost", port=50000):
         if gateway is None:
@@ -88,9 +93,11 @@ class PIHexapod(GCSDevice):
             # Use dll as gateway. It requires the GCS DLL to be installed
             super().__init__(devname=self.CONTROLLERNAME, gcsdll=gcsdll)
             self.ConnectTCPIP(ipaddress=host, ipport=port)
-        
+
         else:
-            super().__init__(devname=self.CONTROLLERNAME, gcsdll=gcsdll, gateway=gateway)
+            super().__init__(devname=self.CONTROLLERNAME,
+                             gcsdll=gcsdll,
+                             gateway=gateway)
 
         logging.info(f"Connected {self.qIDN().strip()}")
         logging.info(f"Version:\n{self.version}")
@@ -115,7 +122,7 @@ class PIHexapod(GCSDevice):
 
     def start_up(self):
         logging.info("Initializing connected stages...")
-        
+
         initialized = False
         max_attemps = 5
         while not initialized and max_attemps > 0:
@@ -128,13 +135,12 @@ class PIHexapod(GCSDevice):
                 if max_attemps == 0:
                     raise ex
 
-
     def new_coordinate_system(self, name: str, coords: Dict[str, float]):
         self.KSD(name, coords)
 
     def set_parent_coordinate_system(self, childs: str, parent: str):
         self.KLN(childs, parent)
-    
+
     def enable_coordinate_system(self, name: str):
         self.KEN(name)
 
@@ -171,7 +177,7 @@ class PIHexapod(GCSDevice):
             self.move_error_msg = e
 
     def move_to_zero(self):
-        self.move_to({'X':0, 'Y':0, 'Z':0, 'U':0, 'V':0, 'W':0})
+        self.move_to({'X': 0, 'Y': 0, 'Z': 0, 'U': 0, 'V': 0, 'W': 0})
 
     def on_target(self, axes: Set[str] = {'X', 'Y', 'Z', 'U', 'V', 'W'}):
         axes_on_target = self.qONT()
@@ -179,9 +185,9 @@ class PIHexapod(GCSDevice):
         result = True
         for axis in axes:
             result &= axes_on_target[axis]
-            if result == False:
+            if not result:
                 return False
-        
+
         return True
 
     def set_pivot(self, coords: Dict[str, float]):

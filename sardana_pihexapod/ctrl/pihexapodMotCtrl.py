@@ -7,6 +7,9 @@ from sardana_pihexapod.ctrl.pihexapod import PIHexapod
 
 import time
 
+import argparse
+
+
 class PIHexapodMotCtrl(MotorController):
 
     _map_axis = {
@@ -20,10 +23,17 @@ class PIHexapodMotCtrl(MotorController):
 
     # The properties used to connect to the IcePAP motor controller
     ctrl_properties = {
-        'Host': {Type: str, Description: 'The host name', DefaultValue: "dlaelcthex01"},
-        'Port': {Type: int, Description: 'The port number', DefaultValue: 50000}
+        'Host': {
+            Type: str,
+            Description: 'The host name',
+            DefaultValue: "dlaelcthex01"
+        },
+        'Port': {
+            Type: int,
+            Description: 'The port number',
+            DefaultValue: 50000
+        }
     }
-    
 
     def __init__(self, inst, props, *args, **kwargs):
         super().__init__(inst, props, *args, **kwargs)
@@ -34,7 +44,7 @@ class PIHexapodMotCtrl(MotorController):
     def AddDevice(self, axis):
         if not self._motors:
             self.hexapod = PIHexapod(host=self.Host, port=self.Port)
-        
+
         self._motors[self._map_axis[axis]] = dict(step_per_unit=1.0)
 
     def DeleteDevice(self, axis):
@@ -73,13 +83,15 @@ class PIHexapodMotCtrl(MotorController):
 
     def StateOne(self, axis):
         if self.hexapod.move_error:
-            return State.Alarm, f"Error in axis {axis}, {self.hexapod.move_error_msg}\n{self.hexapod.get_axis_status(axis)}", 0
+            message = f"Error in axis {axis}, {self.hexapod.move_error_msg}\n\
+                {self.hexapod.get_axis_status(axis)}"
+            return State.Alarm, message, 0
         else:
             if self.hexapod.on_target({self._map_axis[axis]}):
                 return State.On, "Hexapod is stopped", 0
             else:
                 return State.Moving, "Hexapod is moving", 0
-    
+
     def GetAxisPar(self, axis: int, name: str):
         hexapod = self.hexapod
         name = name.lower()
@@ -88,7 +100,9 @@ class PIHexapodMotCtrl(MotorController):
         elif name == "step_per_unit":
             return self._motor[self._map_axis[axis]]["step_per_unit"]
         else:
-            logging.warning(f"HexapodController - GetAxisPar not defined: {self._map_axis[axis]}, {name}")    
+            message = f"HexapodController - GetAxisPar not defined: "\
+                      f"{self._map_axis[axis]}, {name}"
+            logging.warning(message)
 
     def SetAxisPar(self, axis: int, name: str, value):
         hexapod = self.hexapod
@@ -96,7 +110,9 @@ class PIHexapodMotCtrl(MotorController):
         if name == "velocity":
             hexapod.velocity = value
         else:
-            logging.warning(f"HexapodController - SetAxisPar not supported: {self._map_axis[axis]}, {name}, {value}")
+            message = f"HexapodController - SetAxisPar not supported: "\
+                      f"{self._map_axis[axis]}, {name}, {value}"
+            logging.warning(message)
 
     def print_to_cmd(self, p):
         print(f"cosa cosa: {p}")
@@ -108,9 +124,12 @@ class PIHexapodMotCtrl(MotorController):
 
 
 def main():
-    host = 'dlaelcthex01'
-    port = 50000
-    ctrl = PIHexapodMotCtrl('test', {'Host': host, 'Port': port})
+    parser = argparse.ArgumentParser()
+    parser.add_argument("host")
+    parser.add_argument("port", default=50000)
+    args = parser.parse_args()
+
+    ctrl = PIHexapodMotCtrl('test', {'Host': args.host, 'Port': args.port})
     ctrl.AddDevice(1)
     ctrl.AddDevice(2)
     ctrl.AddDevice(3)
@@ -118,8 +137,6 @@ def main():
     ctrl.AddDevice(5)
     ctrl.AddDevice(6)
 
-    # ctrl._synchronization = AcqSynch.SoftwareTrigger
-    # ctrl._synchronization = AcqSynch.HardwareTrigger
     axis1 = 3
     position1 = -3
     ctrl.PreStartAll()
@@ -139,6 +156,7 @@ def main():
     print("Axis1: ", axis1, ctrl.ReadOne(axis1))
     print("Axis2: ", axis2, ctrl.ReadOne(axis2))
     return ctrl
+
 
 if __name__ == '__main__':
     main()
