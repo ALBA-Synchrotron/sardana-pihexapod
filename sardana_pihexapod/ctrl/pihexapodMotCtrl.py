@@ -125,8 +125,8 @@ class PIHexapodMotCtrl(MotorController):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("host")
-    parser.add_argument("port", default=50000)
+    parser.add_argument("host", type=str)
+    parser.add_argument("port", type=int, default=50000)
     args = parser.parse_args()
 
     ctrl = PIHexapodMotCtrl('test', {'Host': args.host, 'Port': args.port})
