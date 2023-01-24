@@ -8,7 +8,7 @@ Install PI GSCD Library for your operating system and install the PIPython libra
 
 Clone this repository:
 ```
-https://git.cells.es/controls/minerva/python_hexapod_core.git
+https://github.com/ALBA-Synchrotron/sardana-pihexapod.git
 ```
 
 Install with pip
