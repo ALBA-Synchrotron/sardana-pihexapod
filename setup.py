@@ -36,7 +36,7 @@ setup(
     name='sardana_pihexapod',
     packages=find_packages(include=['sardana_pihexapod', 'sardana_pihexapod.*']),
 
-    url='https://git.cells.es/controls/minerva/python_hexapod_core',
-    version='1.0.1',
+    url='https://github.com/ALBA-Synchrotron/sardana-pihexapod',
+    version='1.1.2',
     zip_safe=False,
 )
