@@ -5,6 +5,9 @@ from pipython.pidevice.interfaces.pisocket import PISocket
 import os
 import logging
 
+# Change logging level of pipython package
+pilogger = logging.getLogger('PIlogger')
+pilogger.setLevel(logging.WARNING)
 
 def bit_enabled(code: int, pos: int) -> bool:
     return code & (0x01 << pos) != 0
@@ -85,6 +88,9 @@ class PIHexapod(GCSDevice):
                          self.det_ref_value, self.on_target)
 
     def __init__(self, gcsdll='', gateway=None, host="localhost", port=50000):
+
+        self.log = logging.getLogger('pihexapod.PIHexapod({0}:{1})'.format(host, port))
+
         if gateway is None:
             gateway = PISocket(host=host, port=port)
             super().__init__(gateway=gateway)
@@ -99,29 +105,29 @@ class PIHexapod(GCSDevice):
                              gcsdll=gcsdll,
                              gateway=gateway)
 
-        logging.info(f"Connected {self.qIDN().strip()}")
-        logging.info(f"Version:\n{self.version}")
+        self.log.info(f"Connected {self.qIDN().strip()}")
+        self.log.info(f"Version:\n{self.version}")
 
         self.start_up()
 
-        logging.info(f"Connected axes: {self.axes}")
+        self.log.info(f"Connected axes: {self.axes}")
 
         self.rangemin = self.qTMN()
         self.rangemax = self.qTMX()
 
-        logging.info(f"Min axes range: {self.rangemin}")
-        logging.info(f"Max axes range: {self.rangemax}")
+        self.log.info(f"Min axes range: {self.rangemin}")
+        self.log.info(f"Max axes range: {self.rangemax}")
 
         self.move_error = False
         self.move_error_msg = None
 
-        logging.info(f"Status: {self.qSRG()}")
+        self.log.info(f"Status: {self.qSRG()}")
 
     def __del__(self):
         self.CloseConnection()
 
     def start_up(self):
-        logging.info("Initializing connected stages...")
+        self.log.info("Initializing connected stages...")
 
         initialized = False
         max_attemps = 5
@@ -131,7 +137,7 @@ class PIHexapod(GCSDevice):
                 initialized = True
             except gcserror.GCSError as ex:
                 max_attemps -= 1
-                logging.warn(ex)
+                self.log.warning(ex)
                 if max_attemps == 0:
                     raise ex
 
@@ -162,7 +168,7 @@ class PIHexapod(GCSDevice):
             self.move_error_msg = None
             self.MOV(pos)
         except Exception as e:
-            logging.error(f"Exception ocurred during move_to: {e}")
+            self.log.error(f"Exception ocurred during move_to: {e}")
             self.move_error = True
             self.move_error_msg = e
 
@@ -172,7 +178,7 @@ class PIHexapod(GCSDevice):
             self.move_error_msg = None
             self.MVR(inc)
         except Exception as e:
-            logging.error(f"Exception ocurred during move_relative: {e}")
+            self.log.error(f"Exception ocurred during move_relative: {e}")
             self.move_error = True
             self.move_error_msg = e
 

@@ -55,7 +55,7 @@ class PIHexapodMotCtrl(MotorController):
             self.hexapod = None
 
     def ReadOne(self, axis):
-        print(f"ReadOne {self._map_axis[axis]}")
+        self._log.debug(f"Entering ReadOne for axis {axis}")
         return self.hexapod.current_position()[self._map_axis[axis]]
 
     def PreStartAll(self):
@@ -67,7 +67,7 @@ class PIHexapodMotCtrl(MotorController):
         self._moveable_info[self._map_axis[axis]] = position
 
     def StartAll(self):
-        print(f"StartAll: {self._moveable_info}")
+        self._log.debug(f"Entering StartAll for axis {axis}")
         return self.hexapod.move_to(self._moveable_info)
 
     def PreStopAll(self):
@@ -82,6 +82,7 @@ class PIHexapodMotCtrl(MotorController):
         self.hexapod.halt(self._moveable_info)
 
     def StateOne(self, axis):
+        self._log.debug(f"Entering StateOne for axis {axis}")
         if self.hexapod.move_error:
             message = f"Error in axis {axis}, {self.hexapod.move_error_msg}\n\
                 {self.hexapod.get_axis_status(axis)}"
@@ -102,7 +103,7 @@ class PIHexapodMotCtrl(MotorController):
         else:
             message = f"HexapodController - GetAxisPar not defined: "\
                       f"{self._map_axis[axis]}, {name}"
-            logging.warning(message)
+            self._log.warning(message)
 
     def SetAxisPar(self, axis: int, name: str, value):
         hexapod = self.hexapod
@@ -112,7 +113,7 @@ class PIHexapodMotCtrl(MotorController):
         else:
             message = f"HexapodController - SetAxisPar not supported: "\
                       f"{self._map_axis[axis]}, {name}, {value}"
-            logging.warning(message)
+            self._log.warning(message)
 
     def print_to_cmd(self, p):
         print(f"cosa cosa: {p}")
