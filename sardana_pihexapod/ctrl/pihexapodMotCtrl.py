@@ -38,13 +38,11 @@ class PIHexapodMotCtrl(MotorController):
     def __init__(self, inst, props, *args, **kwargs):
         super().__init__(inst, props, *args, **kwargs)
 
-        self.hexapod = None
+        self.hexapod = PIHexapod(host=self.Host, port=self.Port)
         self._motors = {}
 
     def AddDevice(self, axis):
-        if not self._motors:
-            self.hexapod = PIHexapod(host=self.Host, port=self.Port)
-
+        self._log.debug(f"Entering AddDevice for axis {axis} ({self._map_axis[axis]})")
         self._motors[self._map_axis[axis]] = dict(step_per_unit=1.0)
 
     def DeleteDevice(self, axis):
