@@ -65,7 +65,7 @@ class PIHexapodMotCtrl(MotorController):
         self._moveable_info[self._map_axis[axis]] = position
 
     def StartAll(self):
-        self._log.debug(f"Entering StartAll for axis {axis}")
+        self._log.debug("Entering StartAll for all axis")
         return self.hexapod.move_to(self._moveable_info)
 
     def PreStopAll(self):
