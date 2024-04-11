@@ -37,6 +37,6 @@ setup(
     packages=find_packages(include=['sardana_pihexapod', 'sardana_pihexapod.*']),
 
     url='https://github.com/ALBA-Synchrotron/sardana-pihexapod',
-    version='1.1.3',
+    version='1.1.4',
     zip_safe=False,
 )
